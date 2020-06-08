@@ -46,7 +46,11 @@ public struct QGrid<Data, Content>: View
   
   private let data: [Data.Element]
   private let content: (Data.Element) -> Content
-  
+  private let contentOffsetChanged: ((CGFloat) -> Void)?
+    
+  @State var contentOffset: CGFloat = .zero
+  @State var scrollViewContentHeight: CGFloat = .zero
+    
   // MARK: - INITIALIZERS
   
   /// Creates a QGrid that computes its cells from an underlying collection of identified data.
@@ -61,6 +65,8 @@ public struct QGrid<Data, Content>: View
   ///     - hPadding: Horizontal padding: The distance between leading/trailing edge of the grid and the parent view. If not provided, the default value will be used.
   ///     - isScrollable: Boolean that determines whether or not the grid should scroll
   ///     - content: A closure returning the content of the individual cell
+  ///     - contentOffsetChanged: A closure returning the content offset value
+    
   public init(_ data: Data,
               columns: Int,
               columnsInLandscape: Int? = nil,
@@ -70,6 +76,7 @@ public struct QGrid<Data, Content>: View
               hPadding: CGFloat = 10,
               isScrollable: Bool = true,
               showScrollIndicators: Bool = false,
+              contentOffsetChanged: ((CGFloat) -> Void)? = nil,
               content: @escaping (Data.Element) -> Content) {
     self.data = data.map { $0 }
     self.content = content
@@ -81,6 +88,7 @@ public struct QGrid<Data, Content>: View
     self.hPadding = hPadding
     self.isScrollable = isScrollable
     self.showScrollIndicators = showScrollIndicators
+    self.contentOffsetChanged = contentOffsetChanged
   }
   
   // MARK: - COMPUTED PROPERTIES
@@ -104,8 +112,14 @@ public struct QGrid<Data, Content>: View
     GeometryReader { geometry in
       Group {
         if self.isScrollable {
-          ScrollView(showsIndicators: self.showScrollIndicators) {
-            self.content(using: geometry)
+          ScrollTrackerView(contentOffset: self.$contentOffset) {
+            self.content(using: geometry).modifier(ViewHeightKey())
+          }.contentOffsetChanged {
+              let maximumOffset: CGFloat = self.scrollViewContentHeight - geometry.size.height
+            let distanceToBottom: CGFloat = (maximumOffset + (self.vPadding * 2)) - self.contentOffset
+            self.contentOffsetChanged?(distanceToBottom)
+          }.onPreferenceChange(ViewHeightKey.self) {
+              self.scrollViewContentHeight = $0
           }
         } else {
           self.content(using: geometry)
@@ -154,4 +168,3 @@ public struct QGrid<Data, Content>: View
     return width / CGFloat(self.cols)
   }
 }
-
