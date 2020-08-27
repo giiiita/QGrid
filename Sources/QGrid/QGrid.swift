@@ -113,7 +113,10 @@ public struct QGrid<Data, Content>: View
       Group {
         if self.isScrollable {
             ScrollTrackerView(parentMinY: geometry.frame(in: .global).minY + self.vPadding, contentOffset: self.$contentOffset) {
-            self.content(using: geometry).modifier(ViewHeightKey())
+            self.content(using: geometry)
+                .modifier(ViewHeightKey())
+                .padding(.horizontal, self.hPadding)
+                .padding(.vertical, self.vPadding)
           }.contentOffsetChanged {
               let maximumOffset: CGFloat = self.scrollViewContentHeight - geometry.size.height
             let distanceToBottom: CGFloat = (maximumOffset + (self.vPadding * 2)) - self.contentOffset
@@ -123,10 +126,10 @@ public struct QGrid<Data, Content>: View
           }
         } else {
           self.content(using: geometry)
+            .padding(.horizontal, self.hPadding)
+            .padding(.vertical, self.vPadding)
         }
       }
-      .padding(.horizontal, self.hPadding)
-      .padding(.vertical, self.vPadding)
     }
   }
   
