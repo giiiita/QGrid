@@ -112,7 +112,7 @@ public struct QGrid<Data, Content>: View
     GeometryReader { geometry in
       Group {
         if self.isScrollable {
-            ScrollTrackerView(parentMinY: geometry.frame(in: .global).minY + self.vPadding, contentOffset: self.$contentOffset) {
+            ScrollTrackerView(parentMinY: geometry.frame(in: .global).minY, contentOffset: self.$contentOffset) {
             self.content(using: geometry)
                 .modifier(ViewHeightKey())
                 .padding(.horizontal, self.hPadding)
