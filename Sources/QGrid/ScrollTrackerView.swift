@@ -11,21 +11,15 @@ struct ScrollTrackerView<Content>: View where Content: View {
     let showIndicators: Bool
     let content: Content
     let parentMinY: CGFloat
-    let bottomMargin: CGFloat
     private var contentOffsetChanged: (() -> Void)?
     
     @Binding var contentOffset: CGFloat
     
-    init(showIndicators: Bool = true,
-         parentMinY: CGFloat,
-         bottomMargin: CGFloat,
-         contentOffset: Binding<CGFloat>,
-         @ViewBuilder content: () -> Content) {
+    init(showIndicators: Bool = true, parentMinY: CGFloat, contentOffset: Binding<CGFloat>, @ViewBuilder content: () -> Content) {
         self.showIndicators = showIndicators
         self._contentOffset = contentOffset
         self.content = content()
         self.parentMinY = parentMinY
-        self.bottomMargin = bottomMargin
     }
     
     var body: some View {
@@ -37,7 +31,6 @@ struct ScrollTrackerView<Content>: View where Content: View {
                 }
                 VStack {
                     self.content
-                    Color.white.frame(height: self.bottomMargin)
                 }
             }
         }
