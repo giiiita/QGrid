@@ -41,6 +41,7 @@ public struct QGrid<Data, Content>: View
   private let hSpacing: CGFloat
   private let vPadding: CGFloat
   private let hPadding: CGFloat
+  private let bottomMargin: CGFloat
   private let isScrollable: Bool
   private let showScrollIndicators: Bool
   
@@ -74,6 +75,7 @@ public struct QGrid<Data, Content>: View
               hSpacing: CGFloat = 10,
               vPadding: CGFloat = 10,
               hPadding: CGFloat = 10,
+              bottomMargin: CGFloat = 100,
               isScrollable: Bool = true,
               showScrollIndicators: Bool = false,
               contentOffsetChanged: ((CGFloat) -> Void)? = nil,
@@ -86,6 +88,7 @@ public struct QGrid<Data, Content>: View
     self.hSpacing = hSpacing
     self.vPadding = vPadding
     self.hPadding = hPadding
+    self.bottomMargin = bottomMargin
     self.isScrollable = isScrollable
     self.showScrollIndicators = showScrollIndicators
     self.contentOffsetChanged = contentOffsetChanged
@@ -112,7 +115,10 @@ public struct QGrid<Data, Content>: View
     GeometryReader { geometry in
       Group {
         if self.isScrollable {
-            ScrollTrackerView(parentMinY: geometry.frame(in: .global).minY, contentOffset: self.$contentOffset) {
+            ScrollTrackerView(
+                parentMinY: geometry.frame(in: .global).minY,
+                bottomMargin: self.bottomMargin,
+                contentOffset: self.$contentOffset) {
             self.content(using: geometry)
                 .modifier(ViewHeightKey())
                 .padding(.horizontal, self.hPadding)
